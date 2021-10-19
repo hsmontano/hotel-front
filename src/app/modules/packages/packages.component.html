@@ -1,0 +1,136 @@
+<div class="card border-primary mb-3">
+  <div class="card-header">Paquetes turisticos</div>
+  <div class="card-body text-primary">
+    <h5 class="card-text">Lista de paquetes turisticos</h5>
+    <div class="my-2 text-left">
+      <button type="button" class="btn btn-rounded btn-primary" (click)="openModal(modalSave, 'create')">Crear Paquete Turistico</button>
+    </div>
+    <div *ngIf="packages?.length === 0" class="alert alert-info">
+      No hay registros en la base de datos del sistema.
+    </div>
+  </div>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Nombre</th>
+      <th>Alimentaci&oacute;n</th>
+      <th>Creado</th>
+      <th>Actualizado</th>
+      <th>
+        Actualizar
+      </th>
+      <th>
+        Eliminar
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let package of packages; let i = index">
+      <td>{{ i+1 }}</td>
+      <td>{{ package.nombre }}</td>
+      <td>{{ package.alimentacion }}</td>
+      <td>{{ package.createdAt | date: 'medium' }}</td>
+      <td>{{ package.updatedAt | date: 'medium' }}</td>
+      <td>
+        <button type="button" name="editar" (click)="openModal(modalSave, 'update', package._id)" class="btn btn-warning btn-sm">Editar</button>
+      </td>
+      <td>
+        <button type="button" name="eliminar" (click)="openModal(modalDelete, 'delete', package._id)" class="btn btn-danger btn-sm">Eliminar</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Delete-->
+<ng-template #modalDelete let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Confirmación</h4>
+    <button type="button" class="close" aria-describedby="modal-title" (click)="modal.dismiss('close')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>
+      <strong
+      >¿Desea eliminar el registro
+        <span class="text-info">"seleccionado"</span>?</strong>
+    </p>
+    <p>
+      Toda la información asociada a este registro se eliminará de forma
+      permanente.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <button type="button" class="btn btn_outline_secondary text-dark" (click)="modal.close('not')">
+        No
+      </button>
+      <button type="button" ngbAutofocus class="btn btn-danger" (click)="modal.close('yes')">
+        <span class="text-white">Si</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Modal Save-->
+<ng-template #modalSave let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!package._id else elseEdit"> Crear Paquete turistico</h4>
+    <ng-template #elseEdit>
+      <h4 class="modal-title" id="modal-basic-title"> Editar Paquete turistico</h4>
+    </ng-template>
+    <button type="button" class="close" aria-describedby="modal-title" (click)="modal.dismiss('close')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #packageForm="ngForm">
+      <div class="row">
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" class="form-control" [(ngModel)]="package.nombre" name="nombre" placeholder="Ingrese el nombre" required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="alimentacion">Alimentaci&oacute;n</label>
+            <input type="text" id="alimentacion" class="form-control" [(ngModel)]="package.alimentacion" name="alimentacion" placeholder="Ingrese la alimentacion"/>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="actividad">Actividad</label>
+            <input type="text" id="actividad" class="form-control" [(ngModel)]="package.actividad" name="actividad" placeholder="Ingrese la actividad" required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="asistencia">Asistencia m&eacute;dica</label>
+            <input type="text" id="asistencia" class="form-control" [(ngModel)]="package.asistencia" name="asistencia" placeholder="Ingrese la asistencia medica"/>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <button type="button" class="btn btn-secondary mx-2" (click)="modal.close('not')">
+        Cancelar
+      </button>
+      <button type="button" ngbAutofocus class="btn btn-primary" *ngIf="!package._id else elseBlock" [disabled]="!packageForm.valid" (click)="modal.close('create')">
+        <span>Guardar</span>
+      </button>
+
+      <ng-template #elseBlock>
+        <button type="button" ngbAutofocus class="btn btn-warning" (click)="modal.close('update')">
+          <span>Editar</span>
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</ng-template>

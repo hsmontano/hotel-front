@@ -1,0 +1,158 @@
+<div class="card border-primary mb-3">
+  <div class="card-header">Reservas</div>
+  <div class="card-body text-primary">
+    <h5 class="card-text">Lista de reservas</h5>
+    <div class="my-2 text-left">
+      <button type="button" class="btn btn-rounded btn-primary" (click)="openModal(modalSave, 'create')">Crear Reservas</button>
+    </div>
+    <div *ngIf="bookings?.length === 0" class="alert alert-info">
+      No hay registros en la base de datos del sistema.
+    </div>
+  </div>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Nombre</th>
+      <th>Identificaci&oacute;n</th>
+      <th>Fecha</th>
+      <th>Creado</th>
+      <th>Actualizado</th>
+      <th>
+        Actualizar
+      </th>
+      <th>
+        Eliminar
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let booking of bookings; let i = index">
+      <td>{{ i+1 }}</td>
+      <td>{{ booking.nombre }}</td>
+      <td>{{ booking.identificacion }}</td>
+      <td>{{ booking.fecha | date: 'medium' }}</td>
+      <td>{{ booking.createdAt | date: 'medium' }}</td>
+      <td>{{ booking.updatedAt | date: 'medium' }}</td>
+      <td>
+        <button type="button" name="editar" (click)="openModal(modalSave, 'update', booking._id)" class="btn btn-warning btn-sm">Editar</button>
+      </td>
+      <td>
+        <button type="button" name="eliminar" (click)="openModal(modalDelete, 'delete', booking._id)" class="btn btn-danger btn-sm">Eliminar</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Delete-->
+<ng-template #modalDelete let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Confirmación</h4>
+    <button type="button" class="close" aria-describedby="modal-title" (click)="modal.dismiss('close')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>
+      <strong
+      >¿Desea eliminar el registro
+        <span class="text-info">"seleccionado"</span>?</strong>
+    </p>
+    <p>
+      Toda la información asociada a este registro se eliminará de forma
+      permanente.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <button type="button" class="btn btn_outline_secondary text-dark" (click)="modal.close('not')">
+        No
+      </button>
+      <button type="button" ngbAutofocus class="btn btn-danger" (click)="modal.close('yes')">
+        <span class="text-white">Si</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Modal Save-->
+<ng-template #modalSave let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!booking._id else elseEdit"> Crear Reserva</h4>
+    <ng-template #elseEdit>
+      <h4 class="modal-title" id="modal-basic-title"> Editar Reserva</h4>
+    </ng-template>
+    <button type="button" class="close" aria-describedby="modal-title" (click)="modal.dismiss('close')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #bookingForm="ngForm">
+      <div class="row">
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" class="form-control" [(ngModel)]="booking.nombre" name="nombre" placeholder="Ingrese el nombre" required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="fecha">Fecha</label>
+              <input type="datetime-local" id="fecha" class="form-control" [(ngModel)]="booking.fecha" name="fecha"/>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="ciudad">Ciudad</label>
+            <input type="text" id="ciudad" class="form-control" [(ngModel)]="booking.ciudad" name="ciudad" placeholder="Ingrese la ciudad" required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="identificaion">Identificaci&oacute;n</label>
+            <input type="text" id="identificaion" class="form-control" [(ngModel)]="booking.identificacion" name="identificaion" placeholder="Ingrese el numero de cedula"/>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="habitacion">Habitaci&oacute;n</label>
+            <select [compareWith]="compareBedroom" id="habitacion" class="form-control" [(ngModel)]="booking.habitacion" name="habitacion">
+              <option [ngValue]="undefined" disabled>Seleccionar habitaci&oacute;n</option>
+              <option *ngFor="let bedroom of bedrooms" [ngValue]="bedroom">{{ bedroom.nombre }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6 my-2">
+          <div class="form-group">
+            <label for="paquete">Paquete</label>
+            <select [compareWith]="comparePackage" id="paquete" class="form-control" [(ngModel)]="booking.paquete" name="paquete">
+              <option [ngValue]="undefined" disabled >Seleccionar paquete</option>
+              <option *ngFor="let package of packages" [ngValue]="package">{{ package.nombre }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <button type="button" class="btn btn-secondary mx-2" (click)="modal.close('not')">
+        Cancelar
+      </button>
+      <button type="button" ngbAutofocus class="btn btn-primary" *ngIf="!booking._id else elseBlock" [disabled]="!bookingForm.valid" (click)="modal.close('create')">
+        <span>Guardar</span>
+      </button>
+
+      <ng-template #elseBlock>
+        <button type="button" ngbAutofocus class="btn btn-warning" (click)="modal.close('update')">
+          <span>Editar</span>
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</ng-template>
